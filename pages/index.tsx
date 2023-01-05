@@ -5,13 +5,6 @@ import {
   TabPanels,
   Tab,
   TabPanel,
-  TableContainer,
-  Table,
-  Thead,
-  Tr,
-  Th,
-  Tbody,
-  Td,
   Box,
 } from "@chakra-ui/react";
 import { Car, State } from "../types/parking-lot";
@@ -24,45 +17,28 @@ import {
 import EnterForm from "@/components/EnterForm";
 import Head from "next/head";
 import LeaveForm from "@/components/LeaveForm";
+import CarsTable from "@/components/CarsTable";
 
 export default function Home() {
   const [state, setState] = useState<State>(initialState);
   const [errorMessage, setErrorMessage] = useState("");
 
   function handleEnter(car: Car) {
-    try {
-      if (state.cars.filter((f) => f.id === car.id).length > 0) {
-        throw new Error("Car already exists");
-      }
-      if (state.cars.filter((f) => f.lot === car.lot).length > 0) {
-        throw new Error("Parking lot already occupied");
-      }
-      setState(enter(state, car));
-      setErrorMessage("");
-    } catch (error) {
-      setErrorMessage((error as Error).message);
-    }
+    const newState = enter(state, car);
+    setState(newState);
+    setErrorMessage(newState.errorMessage);
   }
 
   function handleLeave(id: number) {
-    try {
-      if (state.cars.filter((f) => f.id === id).length === 0) {
-        throw new Error("Car not found");
-      }
-      setState(leave(state, id));
-      setErrorMessage("");
-    } catch (error) {
-      setErrorMessage((error as Error).message);
-    }
+    const newState = leave(state, id);
+    setState(newState);
+    setErrorMessage(newState.errorMessage);
   }
 
   function handleFindFreeSpace() {
     const lot = findFreeSpace(state);
-    if (lot === undefined) {
-      setErrorMessage("No free space available");
-    }
-    setErrorMessage("");
-    return lot === undefined ? 0 : lot;
+    setErrorMessage(lot.errorMessage);
+    return lot.lot;
   }
 
   return (
@@ -93,34 +69,7 @@ export default function Home() {
           {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
         </Box>
         <Box>
-          <TableContainer data-testid="cars-table">
-            <Table variant="simple">
-              <Thead>
-                <Tr>
-                  <Th>Car Number</Th>
-                  <Th>Car Color</Th>
-                  <Th>Parking Lot Number</Th>
-                </Tr>
-              </Thead>
-              <Tbody>
-                {state.cars.length > 0 ? (
-                  state.cars.map((car) => (
-                    <Tr key={car.id}>
-                      <Td>{car.id}</Td>
-                      <Td>{car.color}</Td>
-                      <Td>{car.lot}</Td>
-                    </Tr>
-                  ))
-                ) : (
-                  <Tr>
-                    <Td colSpan={3} textAlign="center">
-                      No Data
-                    </Td>
-                  </Tr>
-                )}
-              </Tbody>
-            </Table>
-          </TableContainer>
+          <CarsTable cars={state.cars} />
         </Box>
       </Box>
     </>
