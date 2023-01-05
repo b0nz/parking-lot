@@ -1,14 +1,12 @@
-import { render, screen } from '@testing-library/react'
-import Home from '@/pages/index'
+import { render, screen } from "@testing-library/react";
+import Home from "@/pages/index";
 
-describe('Home', () => {
-  it('renders a heading', () => {
-    render(<Home />)
+describe("Home", () => {
+  it("renders a heading", () => {
+    render(<Home />);
 
-    const heading = screen.getByRole('heading', {
-      name: /welcome to next\.js!/i,
-    })
+    const table = screen.getByTestId("cars-table");
 
-    expect(heading).toBeInTheDocument()
-  })
-})
+    expect(table).toBeInTheDocument();
+  });
+});
