@@ -5,6 +5,7 @@ export const initialState: State = {
   errorMessage: "",
 };
 
+// car enters the parking lot
 export function enter(state: State, car: Car): State {
   try {
     if (state.cars.filter((f) => f.id === car.id).length > 0) {
@@ -26,6 +27,7 @@ export function enter(state: State, car: Car): State {
   }
 }
 
+// car leaves the parking lot
 export function leave(state: State, id: number): State {
   try {
     if (state.cars.filter((f) => f.id === id).length === 0) {
@@ -43,6 +45,7 @@ export function leave(state: State, id: number): State {
   }
 }
 
+// parking lot with max 10 spaces
 export function freeSpace(state: State): number | undefined {
   for (let i = 1; i <= 10; i++) {
     if (!state.cars.some((car) => car.lot === i)) {
@@ -52,6 +55,7 @@ export function freeSpace(state: State): number | undefined {
   return undefined;
 }
 
+// find free space
 export function findFreeSpace(state: State): {
   lot: number;
   errorMessage: string;

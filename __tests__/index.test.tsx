@@ -68,7 +68,7 @@ describe("Home", () => {
     });
   });
 
-  it('remove car from the parking lot', () => {
+  it("remove car from the parking lot", () => {
     const { getByTestId, getByText } = render(<Home />);
 
     const carNumberInput = getByTestId("car-number");
@@ -84,12 +84,15 @@ describe("Home", () => {
       fireEvent.click(enterSubmitBtn);
     });
 
-    fireEvent.click(getByText('Leave Parking Lot'));
+    waitFor(() => {
+      fireEvent.click(getByText("Leave Parking Lot"));
+    });
 
     waitFor(() => {
       fireEvent.change(carNumberInput, { target: { value: "123" } });
       fireEvent.click(leaveSubmitBtn);
     });
+    
     waitFor(() => {
       fireEvent.change(carNumberInput, { target: { value: "123" } });
       fireEvent.click(leaveSubmitBtn);
@@ -98,5 +101,5 @@ describe("Home", () => {
     waitFor(() => {
       expect(getByText("Car not found")).toBeInTheDocument();
     });
-  })
+  });
 });
