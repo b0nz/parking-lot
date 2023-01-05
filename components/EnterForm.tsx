@@ -16,8 +16,8 @@ interface IFormInputs {
   lot: number;
 }
 interface IEnterFormProps {
-  onSubmit: (data: IFormInputs) => void;
-  onFindFreeSpace: () => number;
+  onSubmit?: (data: IFormInputs) => void;
+  onFindFreeSpace?: () => number;
 }
 
 const schema = yup
@@ -50,34 +50,51 @@ export default function EnterForm({
   });
 
   return (
-    <form onSubmit={handleSubmit((data) => onSubmit(data))}>
+    <form onSubmit={onSubmit && handleSubmit((data) => onSubmit(data))}>
       <FormControl isInvalid={Boolean(errors.id?.message)}>
         <FormLabel>Car Number</FormLabel>
-        <Input {...register("id")} placeholder="Car number" type="number" />
-        <FormHelperText color="red">{errors.id?.message}</FormHelperText>
+        <Input
+          {...register("id")}
+          placeholder="Car number"
+          type="number"
+          data-testid="car-number"
+        />
+        <FormHelperText data-testid="car-number-error" color="red">
+          {errors.id?.message}
+        </FormHelperText>
       </FormControl>
       <FormControl isInvalid={Boolean(errors.color?.message)}>
         <FormLabel>Car Color</FormLabel>
-        <Input {...register("color")} placeholder="Car color" />
-        <FormHelperText color="red">{errors.color?.message}</FormHelperText>
+        <Input
+          {...register("color")}
+          placeholder="Car color"
+          data-testid="car-color"
+        />
+        <FormHelperText data-testid="car-color-error" color="red">
+          {errors.color?.message}
+        </FormHelperText>
       </FormControl>
       <FormControl isInvalid={Boolean(errors.lot?.message)}>
         <FormLabel>Parking Lot Number</FormLabel>
         <Input
           {...register("lot")}
+          data-testid="parking-lot-number"
           placeholder="Parking lot number"
           type="number"
         />
-        <FormHelperText color="red">{errors.lot?.message}</FormHelperText>
+        <FormHelperText data-testid="parking-lot-number-error" color="red">
+          {errors.lot?.message}
+        </FormHelperText>
       </FormControl>
 
       <HStack spacing={2}>
-        <Button type="submit" colorScheme="blue">
+        <Button data-testid="submit-btn" type="submit" colorScheme="blue">
           Submit
         </Button>
         <Button
+          data-testid="free-space-btn"
           type="button"
-          onClick={() => setValue("lot", onFindFreeSpace())}
+          onClick={() => onFindFreeSpace && setValue("lot", onFindFreeSpace())}
         >
           Find Free Space
         </Button>
