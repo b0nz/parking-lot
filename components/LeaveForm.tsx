@@ -37,7 +37,10 @@ export default function LeaveForm({ onSubmit }: ILeaveFormProps) {
   });
 
   return (
-    <form onSubmit={handleSubmit((data) => onSubmit(data))}>
+    <form
+      data-testid="leave-form"
+      onSubmit={handleSubmit((data) => onSubmit(data))}
+    >
       <FormControl isInvalid={Boolean(errors.id?.message)}>
         <FormLabel>Car Number</FormLabel>
         <Input {...register("id")} placeholder="Car number" type="number" />
@@ -45,7 +48,7 @@ export default function LeaveForm({ onSubmit }: ILeaveFormProps) {
       </FormControl>
 
       <HStack spacing={2}>
-        <Button type="submit" colorScheme="blue">
+        <Button data-testid="leave-submit-btn" type="submit" colorScheme="blue">
           Submit
         </Button>
       </HStack>

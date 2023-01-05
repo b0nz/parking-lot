@@ -6,4 +6,5 @@ export type Car = {
 
 export type State = {
   cars: Car[];
+  errorMessage: string;
 };

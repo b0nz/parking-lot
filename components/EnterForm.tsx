@@ -50,7 +50,7 @@ export default function EnterForm({
   });
 
   return (
-    <form onSubmit={onSubmit && handleSubmit((data) => onSubmit(data))}>
+    <form data-testid="enter-form" onSubmit={onSubmit && handleSubmit((data) => onSubmit(data))}>
       <FormControl isInvalid={Boolean(errors.id?.message)}>
         <FormLabel>Car Number</FormLabel>
         <Input
@@ -88,7 +88,7 @@ export default function EnterForm({
       </FormControl>
 
       <HStack spacing={2}>
-        <Button data-testid="submit-btn" type="submit" colorScheme="blue">
+        <Button data-testid="enter-submit-btn" type="submit" colorScheme="blue">
           Submit
         </Button>
         <Button
