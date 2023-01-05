@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/b0nz/parking-lot/branch/master/graph/badge.svg?token=FZXO32CFLV)](https://codecov.io/gh/b0nz/parking-lot)
+
 # Next.js + Jest
 
 This example shows how to configure Jest to work with Next.js.
