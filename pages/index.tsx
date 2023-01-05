@@ -1,65 +1,128 @@
-import Head from 'next/head'
-import Image from 'next/image'
-
-import styles from '@/pages/index.module.css'
+import { useState } from "react";
+import {
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  TableContainer,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+  Box,
+} from "@chakra-ui/react";
+import { Car, State } from "../types/parking-lot";
+import {
+  initialState,
+  enter,
+  leave,
+  findFreeSpace,
+} from "../utils/parking-lot";
+import EnterForm from "@/components/EnterForm";
+import Head from "next/head";
+import LeaveForm from "@/components/LeaveForm";
 
 export default function Home() {
+  const [state, setState] = useState<State>(initialState);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  function handleEnter(car: Car) {
+    try {
+      if (state.cars.filter((f) => f.id === car.id).length > 0) {
+        throw new Error("Car already exists");
+      }
+      if (state.cars.filter((f) => f.lot === car.lot).length > 0) {
+        throw new Error("Parking lot already occupied");
+      }
+      setState(enter(state, car));
+      setErrorMessage("");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+    }
+  }
+
+  function handleLeave(id: number) {
+    try {
+      if (state.cars.filter((f) => f.id === id).length === 0) {
+        throw new Error("Car not found");
+      }
+      setState(leave(state, id));
+      setErrorMessage("");
+    } catch (error) {
+      setErrorMessage((error as Error).message);
+    }
+  }
+
+  function handleFindFreeSpace() {
+    const lot = findFreeSpace(state);
+    if (lot === undefined) {
+      setErrorMessage("No free space available");
+    }
+    setErrorMessage("");
+    return lot === undefined ? 0 : lot;
+  }
+
   return (
-    <div className={styles.container}>
+    <>
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Parking Lot</title>
       </Head>
+      <Box mx="auto" maxW="xl" display="flex" flexDirection="column" gap={8}>
+        <Box>
+          <Tabs>
+            <TabList>
+              <Tab>Enter Parking Lot</Tab>
+              <Tab>Leave Parking Lot</Tab>
+            </TabList>
 
-      <main>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing <code>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/canary/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a href="https://vercel.com/new" className={styles.card}>
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
-    </div>
-  )
+            <TabPanels>
+              <TabPanel>
+                <EnterForm
+                  onSubmit={(data) => handleEnter(data)}
+                  onFindFreeSpace={handleFindFreeSpace}
+                />
+              </TabPanel>
+              <TabPanel>
+                <LeaveForm onSubmit={(data) => handleLeave(data?.id)} />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+        </Box>
+        <Box>
+          <TableContainer data-testid="cars-table">
+            <Table variant="simple">
+              <Thead>
+                <Tr>
+                  <Th>Car Number</Th>
+                  <Th>Car Color</Th>
+                  <Th>Parking Lot Number</Th>
+                </Tr>
+              </Thead>
+              <Tbody>
+                {state.cars.length > 0 ? (
+                  state.cars.map((car) => (
+                    <Tr key={car.id}>
+                      <Td>{car.id}</Td>
+                      <Td>{car.color}</Td>
+                      <Td>{car.lot}</Td>
+                    </Tr>
+                  ))
+                ) : (
+                  <Tr>
+                    <Td colSpan={3} textAlign="center">
+                      No Data
+                    </Td>
+                  </Tr>
+                )}
+              </Tbody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
+    </>
+  );
 }
