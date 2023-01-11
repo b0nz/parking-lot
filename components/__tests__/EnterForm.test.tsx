@@ -8,7 +8,7 @@ test("form with default props", async () => {
   const { getByText } = render(<EnterForm />);
 
   expect(getByText(/Submit/i)).toBeInTheDocument();
-  expect(getByText(/Find free space/i)).toBeInTheDocument();
+  expect(getByText(/Autofill free space/i)).toBeInTheDocument();
 });
 
 test("form displays errors when invalid data is submitted", async () => {
@@ -32,7 +32,7 @@ test("find free space button", async () => {
     <EnterForm onSubmit={onSubmit} onFindFreeSpace={onFindFreeSpace} />
   );
 
-  await fireEvent.click(getByText(/Find Free Space/i));
+  await fireEvent.click(getByText(/Autofill Free Space/i));
 
   expect(getByTestId("parking-lot-number")).toHaveValue(1);
 });

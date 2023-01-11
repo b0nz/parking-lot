@@ -96,7 +96,7 @@ export default function EnterForm({
           type="button"
           onClick={() => onFindFreeSpace && setValue("lot", onFindFreeSpace())}
         >
-          Find Free Space
+          Autofill Free Space
         </Button>
       </HStack>
     </form>

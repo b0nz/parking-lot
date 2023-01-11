@@ -4,7 +4,9 @@ import {
   initialState,
   freeSpace,
   findFreeSpace,
-} from "../utils/parking-lot";
+  listAvailableSpace,
+  findCarLocation,
+} from "../parking-lot";
 
 describe("enter function", () => {
   test("adds a new car to an empty parking lot", () => {
@@ -39,6 +41,14 @@ describe("enter function", () => {
     state = enter(state, car2);
     expect(state.cars).toEqual([car1]);
     expect(state.errorMessage).toEqual("Parking lot already occupied");
+  });
+
+  test("throws an error when trying to add a car and parking lot number is greater than max lot number", () => {
+    let state = initialState;
+    for (let i = 1; i <= 11; i++) {
+      state = enter(state, { id: i, color: "red", lot: i });
+    }
+    expect(state.errorMessage).toEqual("Parking lot not available");
   });
 });
 
@@ -105,5 +115,55 @@ describe("findFreeSpace function", () => {
     const result = findFreeSpace(state);
     expect(result.lot).toEqual(1);
     expect(result.errorMessage).toEqual("");
+  });
+});
+
+describe("listAvailableSpace function", () => {
+  it("should return a list of odd numbered parking lot", () => {
+    let state = initialState;
+    for (let i = 1; i <= 10; i++) {
+      if (i % 2 === 0) {
+        state = enter(state, { id: i, color: "red", lot: i });
+      }
+    }
+    const result = listAvailableSpace(state);
+    expect(result).toEqual([1, 3, 5, 7, 9]);
+  });
+  it("should return a list of even numbered parking lot", () => {
+    let state = initialState;
+    for (let i = 1; i <= 10; i++) {
+      if (i % 2 === 1) {
+        state = enter(state, { id: i, color: "red", lot: i });
+      }
+    }
+    const result = listAvailableSpace(state);
+    expect(result).toEqual([2, 4, 6, 8, 10]);
+  });
+  it("should return empty array when parking lot not available", () => {
+    let state = initialState;
+    for (let i = 1; i <= 10; i++) {
+      state = enter(state, { id: i, color: "red", lot: i });
+    }
+    const result = listAvailableSpace(state);
+    expect(result).toEqual([]);
+  });
+});
+
+describe("findCarLocation function", () => {
+  it("should return the parking lot number of the car", () => {
+    let state = initialState;
+    for (let i = state.maxLot; i >= 1; i--) {
+      state = enter(state, { id: i, color: "red", lot: state.maxLot - i + 1 });
+    }
+    const result = findCarLocation(state, 2);
+    expect(result).toEqual(9);
+  });
+  it("should return 0 when car not found", () => {
+    let state = initialState;
+    for (let i = state.maxLot; i >= 1; i--) {
+      state = enter(state, { id: i, color: "red", lot: state.maxLot - i + 1 });
+    }
+    const result = findCarLocation(state, 11);
+    expect(result).toEqual(0);
   });
 });

@@ -6,47 +6,95 @@ import {
   Tab,
   TabPanel,
   Box,
+  Input,
+  Button,
+  Text,
+  useToast,
 } from "@chakra-ui/react";
-import { Car, State } from "../types/parking-lot";
+import { Car, State } from "@/types/parking-lot";
 import {
   initialState,
   enter,
   leave,
   findFreeSpace,
-} from "../utils/parking-lot";
+  listAvailableSpace,
+  findCarLocation,
+} from "@/lib/parking-lot";
 import EnterForm from "@/components/EnterForm";
 import Head from "next/head";
 import LeaveForm from "@/components/LeaveForm";
 import CarsTable from "@/components/CarsTable";
 
 export default function Home() {
+  const toast = useToast();
   const [state, setState] = useState<State>(initialState);
+  const [lotNum, setLotNum] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
 
-  function handleEnter(car: Car) {
+  const handleEnter = (car: Car) => {
     const newState = enter(state, car);
     setState(newState);
     setErrorMessage(newState.errorMessage);
-  }
+  };
 
-  function handleLeave(id: number) {
+  const handleLeave = (id: number) => {
     const newState = leave(state, id);
     setState(newState);
     setErrorMessage(newState.errorMessage);
-  }
+  };
 
-  function handleFindFreeSpace() {
+  const handleFindFreeSpace = () => {
     const lot = findFreeSpace(state);
     setErrorMessage(lot.errorMessage);
     return lot.lot;
-  }
+  };
+
+  const handleAvailableSpace = () => {
+    const availableSpace = listAvailableSpace(state);
+    setState((prevState) => ({ ...prevState, availableSpace }));
+  };
+
+  const handleReset = () => {
+    setState((prevState) => ({ ...prevState, cars: [] }));
+  };
+
+  const handleFindfindCarLocation = (lotNumber: number) => {
+    const result = findCarLocation(state, lotNumber);
+    const isFound = result !== 0;
+    toast({
+      title: isFound ? "Car found!" : "Car not found!",
+      description: isFound ? `Car Lot Number = ${result}` : "",
+      status: isFound ? "success" : "error",
+      duration: 5000,
+      isClosable: true,
+    });
+  };
 
   return (
     <>
       <Head>
         <title>Parking Lot</title>
       </Head>
-      <Box mx="auto" maxW="xl" display="flex" flexDirection="column" gap={8}>
+      <Box
+        mx="auto"
+        maxW="xl"
+        display="flex"
+        flexDirection="column"
+        gap={8}
+        p={8}
+      >
+        <Box display="flex" flexDirection="column" gap={2}>
+          <Text>Max Lot</Text>
+          <Input
+            value={state.maxLot}
+            onChange={(e) => {
+              setState((prevState) => ({
+                ...prevState,
+                maxLot: Number(e.target.value),
+              }));
+            }}
+          />
+        </Box>
         <Box>
           <Tabs>
             <TabList>
@@ -66,11 +114,29 @@ export default function Home() {
               </TabPanel>
             </TabPanels>
           </Tabs>
-          {errorMessage && <p style={{ color: "red" }}>{errorMessage}</p>}
+          {errorMessage && <Text color="red">{errorMessage}</Text>}
+        </Box>
+        <Box display="flex" flexDir="column" gap={2}>
+          <Text>Available Space : {JSON.stringify(state.availableSpace)}</Text>
+          <Button onClick={handleAvailableSpace}>Available Space</Button>
+        </Box>
+        <Box display="flex" flexDir="column" gap={2}>
+          <Text>Car Number</Text>
+          <Input
+            value={lotNum}
+            onChange={(e) => setLotNum(Number(e.target.value))}
+            placeholder="Car Number"
+          />
+          <Button onClick={() => handleFindfindCarLocation(lotNum)}>
+            Car Location
+          </Button>
         </Box>
         <Box>
           <CarsTable cars={state.cars} />
         </Box>
+        <Button colorScheme="red" onClick={handleReset}>
+          Reset Data
+        </Button>
       </Box>
     </>
   );

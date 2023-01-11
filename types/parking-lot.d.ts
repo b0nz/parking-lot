@@ -7,4 +7,6 @@ export type Car = {
 export type State = {
   cars: Car[];
   errorMessage: string;
+  maxLot: number;
+  availableSpace: Array<number>;
 };
