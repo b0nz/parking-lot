@@ -86,6 +86,7 @@ export default function Home() {
         <Box display="flex" flexDirection="column" gap={2}>
           <Text>Max Lot</Text>
           <Input
+            data-testid="input-max-lot"
             value={state.maxLot}
             onChange={(e) => {
               setState((prevState) => ({
@@ -134,7 +135,7 @@ export default function Home() {
         <Box>
           <CarsTable cars={state.cars} />
         </Box>
-        <Button colorScheme="red" onClick={handleReset}>
+        <Button data-testid="reset-btn" colorScheme="red" onClick={handleReset}>
           Reset Data
         </Button>
       </Box>

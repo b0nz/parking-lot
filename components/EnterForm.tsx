@@ -92,7 +92,7 @@ export default function EnterForm({
           Submit
         </Button>
         <Button
-          data-testid="free-space-btn"
+          data-testid="autofill-free-space-btn"
           type="button"
           onClick={() => onFindFreeSpace && setValue("lot", onFindFreeSpace())}
         >
