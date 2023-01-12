@@ -5,19 +5,21 @@ import {
   FormLabel,
   HStack,
   Input,
+  useToast,
 } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { freeSpace } from "@/lib/parking-lot";
+import { useMemo } from "react";
+import { useAppSelector } from "@/lib/hooks";
+import { enter, selectCars, selectMaxLot } from "@/lib/parkingLotSlice";
+import { useDispatch } from "react-redux";
 
 interface IFormInputs {
   id: number;
   color: string;
   lot: number;
-}
-interface IEnterFormProps {
-  onSubmit?: (data: IFormInputs) => void;
-  onFindFreeSpace?: () => number;
 }
 
 const schema = yup
@@ -36,10 +38,7 @@ const schema = yup
   })
   .required();
 
-export default function EnterForm({
-  onSubmit,
-  onFindFreeSpace,
-}: IEnterFormProps) {
+const EnterForm: React.FC = () => {
   const {
     register,
     handleSubmit,
@@ -48,9 +47,48 @@ export default function EnterForm({
   } = useForm<IFormInputs>({
     resolver: yupResolver(schema),
   });
+  const toast = useToast();
+  const dispatch = useDispatch();
+
+  const maxLotSelector = useAppSelector(selectMaxLot);
+  const carsSelector = useAppSelector(selectCars);
+
+  const cars = useMemo(() => carsSelector, [carsSelector]);
+  const maxLot = useMemo(() => maxLotSelector, [maxLotSelector]);
+  const spaceRecomendation = Number(freeSpace(cars, maxLot));
+
+  const onSubmit = (data: IFormInputs) => {
+    try {
+      if (cars.filter((f) => f.id === data.id).length > 0) {
+        throw new Error("Car already exists");
+      }
+      if (cars.filter((f) => f.lot === data.lot).length > 0) {
+        throw new Error("Parking lot already occupied");
+      }
+      if (data.lot > maxLot) {
+        throw new Error("Parking lot not available");
+      }
+      dispatch(enter(data));
+      toast({
+        title: "Car entered",
+        description: `Car number ${data.id} entered parking lot ${data.lot}`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: (error as Error).message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
 
   return (
-    <form data-testid="enter-form" onSubmit={onSubmit && handleSubmit((data) => onSubmit(data))}>
+    <form data-testid="enter-form" onSubmit={handleSubmit(onSubmit)}>
       <FormControl isInvalid={Boolean(errors.id?.message)}>
         <FormLabel>Car Number</FormLabel>
         <Input
@@ -94,11 +132,13 @@ export default function EnterForm({
         <Button
           data-testid="autofill-free-space-btn"
           type="button"
-          onClick={() => onFindFreeSpace && setValue("lot", onFindFreeSpace())}
+          onClick={() => setValue("lot", spaceRecomendation)}
         >
           Autofill Free Space
         </Button>
       </HStack>
     </form>
   );
-}
+};
+
+export default EnterForm;

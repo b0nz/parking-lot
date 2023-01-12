@@ -1,11 +1,23 @@
-import { TableContainer, Table, Thead, Tr, Th, Tbody, Td } from "@chakra-ui/react";
-import { Car } from "../types/parking-lot";
+import { useMemo } from "react";
+import {
+  TableContainer,
+  Table,
+  Thead,
+  Tr,
+  Th,
+  Tbody,
+  Td,
+} from "@chakra-ui/react";
+import { useAppSelector } from "@/lib/hooks";
+import { selectCars } from "@/lib/parkingLotSlice";
 
-interface Props {
-  cars: Car[];
-}
+const CarsTable: React.FC = () => {
+  const carsSelector = useAppSelector(selectCars);
 
-const CarsTable: React.FC<Props> = ({ cars }) => {
+  const cars = useMemo(() => {
+    return carsSelector;
+  }, [carsSelector]);
+
   return (
     <TableContainer data-testid="cars-table">
       <Table variant="simple">
