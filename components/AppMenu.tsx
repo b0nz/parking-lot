@@ -69,7 +69,7 @@ const AppMenu: React.FC = () => {
       <Button
         data-testid="reset-btn"
         colorScheme="red"
-        onClick={() => dispatch(resetData)}
+        onClick={() => dispatch(resetData())}
       >
         Reset Data
       </Button>

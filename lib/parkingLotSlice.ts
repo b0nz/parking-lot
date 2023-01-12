@@ -32,7 +32,9 @@ export const parkingLotSlice = createSlice({
       state.availableSpace = action.payload;
     },
     resetData: (state) => {
-      state = initialState;
+      state.cars = initialState.cars;
+      state.maxLot = initialState.maxLot;
+      state.availableSpace = initialState.availableSpace;
     },
   },
 });
